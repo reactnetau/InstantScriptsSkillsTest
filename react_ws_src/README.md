@@ -3,5 +3,5 @@ Tasks completed for this skills test.
 - Upgrade necessary libraries to be compatible.
 - Convert all class based components to be functional.
 - Made computer make the best move possible.
-- Add context for modal.
+- Reworked game file
 
