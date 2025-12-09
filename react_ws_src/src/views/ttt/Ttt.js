@@ -11,7 +11,8 @@ const Ttt = () => {
 
   // Determine the current game step based on app settings
   const determineGameStep = () => {
-    if (!app.settings.curr_user || !app.settings.curr_user.name) return 'set_name';
+    if (!app.settings.curr_user || !app.settings.curr_user.name)
+      return 'set_name';
     if (!gameType) return 'set_game_type';
     return 'start_game';
   };
@@ -37,19 +38,25 @@ const Ttt = () => {
   };
 
   return (
-    <section id='TTT_game'>
-      <div id='page-container'>
+    <section id="TTT_game">
+      <div id="page-container">
         {gameStep === 'set_name' && <SetName onSetName={saveUserName} />}
 
         {gameStep !== 'set_name' && (
           <div>
-            <h2>Welcome, {app.settings.curr_user && app.settings.curr_user.name}</h2>
+            <h2>
+              Welcome, {app.settings.curr_user && app.settings.curr_user.name}
+            </h2>
           </div>
         )}
 
-        {gameStep === 'set_game_type' && <SetGameType onSetType={saveGameType} />}
+        {gameStep === 'set_game_type' && (
+          <SetGameType onSetType={saveGameType} />
+        )}
 
-        {gameStep === 'start_game' && <GameMain game_type={gameType} onEndGame={gameEnd} />}
+        {gameStep === 'start_game' && (
+          <GameMain game_type={gameType} onEndGame={gameEnd} />
+        )}
       </div>
     </section>
   );

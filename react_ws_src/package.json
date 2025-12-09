@@ -21,12 +21,15 @@
     "bu": "npm run build && npm run build:copyupd_win",
     "bv": "npm version patch",
     "build:copyall_win": "xcopy dist\\* ..\\WS\\public /E /Y /D && xcopy static\\* ..\\WS\\public /E /Y /D",
-    "build:copyupd_win": "copy dist\\bundle.js ..\\WS\\public\\ && copy dist\\style.css ..\\WS\\public\\"
+    "build:copyupd_win": "copy dist\\bundle.js ..\\WS\\public\\ && copy dist\\style.css ..\\WS\\public\\",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "ampersand-app": "^2.0.0",
+    "axios": "^1.13.2",
     "babel-preset-react-hmre": "^1.1.1",
+    "chart.js": "^4.5.1",
     "eventsource": "^4.1.0",
     "get-size": "^2.0.2",
     "gsap": "^1.18.5",
@@ -35,6 +38,7 @@
     "object-assign": "^4.1.0",
     "prop-types": "^15.8.1",
     "react": "16",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "16",
     "react-ga": "^2.1.1",
     "react-imageloader": "^2.1.0",
@@ -73,6 +77,7 @@
     "jest-cli": "^13.2.3",
     "node-sass": "^9.0.0",
     "npm": "^11.6.4",
+    "prettier": "^3.7.4",
     "proxy-middleware": "^0.15.0",
     "react-addons-test-utils": "^15.2.0",
     "react-refresh": "^0.18.0",

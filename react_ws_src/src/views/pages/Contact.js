@@ -5,7 +5,13 @@ import validator from 'validator';
 import objectAssign from 'object-assign';
 import PropTypes from 'prop-types';
 
-export const FieldHolder = ({ children, isValid, goodClasses, badClass, ...rest }) => {
+export const FieldHolder = ({
+  children,
+  isValid,
+  goodClasses,
+  badClass,
+  ...rest
+}) => {
   const currentClasses = isValid ? goodClasses : `${goodClasses} ${badClass}`;
   return (
     <div {...rest} className={currentClasses}>
@@ -86,7 +92,7 @@ const Contact = () => {
     superagent
       .post(
         app.settings.ws_conf.loc.SCRIPT_ROOT.u +
-          app.settings.ws_conf.loc.SCRIPT__contact_form.u
+          app.settings.ws_conf.loc.SCRIPT__contact_form.u,
       )
       .type('form')
       .send({
@@ -108,51 +114,114 @@ const Contact = () => {
       });
   };
 
-  const { unsent, sending, sent, sentErr, nameValid, emailValid, subjectValid, messageValid } = formState;
+  const {
+    unsent,
+    sending,
+    sent,
+    sentErr,
+    nameValid,
+    emailValid,
+    subjectValid,
+    messageValid,
+  } = formState;
 
-  const sendingCopy = <div>I am sending your message over the wire.......... please hold.</div>;
-  const sendingErr = <div>There was an error sending your request. Please try again</div>;
-  const sentCopy = <div><strong>Okay we got your message, we will be touching base shortly.</strong></div>;
+  const sendingCopy = (
+    <div>I am sending your message over the wire.......... please hold.</div>
+  );
+  const sendingErr = (
+    <div>There was an error sending your request. Please try again</div>
+  );
+  const sentCopy = (
+    <div>
+      <strong>
+        Okay we got your message, we will be touching base shortly.
+      </strong>
+    </div>
+  );
 
   const form = (
-    <form id='contact_form'>
-      <FieldHolder goodClasses='input_holder left' badClass='error' isValid={nameValid}>
-        <label>Name <span className='required'>is a required field</span></label>
-        <input ref={nameRef} type='text' className='input name' placeholder='Name' onBlur={checkOnBlur} />
+    <form id="contact_form">
+      <FieldHolder
+        goodClasses="input_holder left"
+        badClass="error"
+        isValid={nameValid}
+      >
+        <label>
+          Name <span className="required">is a required field</span>
+        </label>
+        <input
+          ref={nameRef}
+          type="text"
+          className="input name"
+          placeholder="Name"
+          onBlur={checkOnBlur}
+        />
       </FieldHolder>
 
-      <FieldHolder goodClasses='input_holder left' badClass='error' isValid={emailValid}>
-        <label>Email <span className='required'>is a required field</span></label>
-        <input ref={emailRef} type='email' className='input name' placeholder='Your Email' onBlur={checkOnBlur} />
+      <FieldHolder
+        goodClasses="input_holder left"
+        badClass="error"
+        isValid={emailValid}
+      >
+        <label>
+          Email <span className="required">is a required field</span>
+        </label>
+        <input
+          ref={emailRef}
+          type="email"
+          className="input name"
+          placeholder="Your Email"
+          onBlur={checkOnBlur}
+        />
       </FieldHolder>
 
-      <FieldHolder goodClasses='input_holder select_option' badClass='error' isValid={subjectValid}>
-        <label>Subject <span className='required'>is a required field</span></label>
+      <FieldHolder
+        goodClasses="input_holder select_option"
+        badClass="error"
+        isValid={subjectValid}
+      >
+        <label>
+          Subject <span className="required">is a required field</span>
+        </label>
         <select ref={subjectRef} onChange={checkOnBlur}>
-          <option value=''>Choose one</option>
+          <option value="">Choose one</option>
           <option>Join / Login</option>
           <option>An issue with the website</option>
           <option>Other</option>
         </select>
       </FieldHolder>
 
-      <FieldHolder goodClasses='input_holder clear message' badClass='error' isValid={messageValid}>
-        <label>Message <span className='required'>is a required field</span></label>
-        <textarea ref={messageRef} className='input textarea' onBlur={checkOnBlur}></textarea>
+      <FieldHolder
+        goodClasses="input_holder clear message"
+        badClass="error"
+        isValid={messageValid}
+      >
+        <label>
+          Message <span className="required">is a required field</span>
+        </label>
+        <textarea
+          ref={messageRef}
+          className="input textarea"
+          onBlur={checkOnBlur}
+        ></textarea>
       </FieldHolder>
 
-      <button type='submit' onClick={sendMessage} className='button'>
-        <span>SEND <span className='fa fa-caret-right'></span></span>
+      <button type="submit" onClick={sendMessage} className="button">
+        <span>
+          SEND <span className="fa fa-caret-right"></span>
+        </span>
       </button>
 
-      <p className='disclaimer'>
-        Any personal information collected in this contact form is so that we can send you the information you have requested. It will not be used for any other reason.
+      <p className="disclaimer">
+        Any personal information collected in this contact form is so that we
+        can send you the information you have requested. It will not be used for
+        any other reason.
       </p>
     </form>
   );
 
   return (
-    <PopUp pageTitle='Contact Us'>
+    <PopUp pageTitle="Contact Us">
       {unsent && form}
       {sending && sendingCopy}
       {sent && !sentErr && sentCopy}

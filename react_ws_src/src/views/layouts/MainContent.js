@@ -4,10 +4,8 @@ import UserDetails from './UserDetails';
 
 const MainContent = ({ children }) => {
   return (
-    <section id='main_content'>
-      <div className='main_container'>
-        {children}
-      </div>
+    <section id="main_content">
+      <div className="main_container">{children}</div>
     </section>
   );
 };

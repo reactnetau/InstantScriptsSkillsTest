@@ -30,41 +30,45 @@ class User {
    * Create new user
    */
   async create(userData) {
-  // Validate required fields
-  if (!userData.name || typeof userData.name !== 'string' || userData.name.trim().length === 0) {
-    throw new Error('User name is required and must be a non-empty string');
+    // Validate required fields
+    if (
+      !userData.name ||
+      typeof userData.name !== 'string' ||
+      userData.name.trim().length === 0
+    ) {
+      throw new Error('User name is required and must be a non-empty string');
+    }
+
+    // Check if user already exists
+    const existingUser = await this.findByName(userData.name.trim());
+    if (existingUser) {
+      throw new Error('User already exists', userData.name);
+    }
+
+    // Get next id
+    const maxIdUser = await this.collection.findOne({}, { sort: { id: -1 } });
+    const nextId = maxIdUser ? maxIdUser.id + 1 : 1;
+
+    // Build user object
+    const now = new Date().toISOString();
+    const newUser = {
+      id: nextId,
+      name: userData.name.trim(),
+      createdAt: now,
+      scores: {
+        ttt: { win: 0, loss: 0, draw: 0, createdAt: now },
+      },
+      streak: 0,
+      maxStreak: 0,
+      achievements: [],
+      history: [],
+    };
+
+    // Insert into collection
+    const result = await this.collection.insertOne(newUser);
+
+    return { ...newUser, _id: result.insertedId };
   }
-
-  // Check if user already exists
-  const existingUser = await this.findByName(userData.name.trim());
-  if (existingUser) {
-    throw new Error('User already exists');
-  }
-
-  // Get next id
-  const maxIdUser = await this.collection.findOne({}, { sort: { id: -1 } });
-  const nextId = maxIdUser ? maxIdUser.id + 1 : 1;
-
-  // Build user object
-  const now = new Date().toISOString();
-  const newUser = {
-    id: nextId,
-    name: userData.name.trim(),
-    createdAt: now,
-    scores: {
-      ttt: { win: 0, loss: 0, draw: 0 }
-    },
-    streak: 0,
-    maxStreak: 0,
-    achievements: [],
-    history: [],
-  };
-
-  // Insert into collection
-  const result = await this.collection.insertOne(newUser);
-
-  return { ...newUser, _id: result.insertedId };
-}
 
   /**
    * Update user by id
@@ -72,7 +76,7 @@ class User {
   async update(id, updateData) {
     const result = await this.collection.updateOne(
       { id: parseInt(id) },
-      { $set: updateData }
+      { $set: updateData },
     );
 
     if (result.matchedCount === 0) {
@@ -98,58 +102,72 @@ class User {
   /**
    * Add score to user
    */
-  async addScore(name, scoreData) {
-    if (!scoreData.gameType) {
-        throw new Error('gameType is required');
+  async addScore(userData) {
+    if (!userData.gameType) {
+      throw new Error('gameType is required');
     }
 
-    const user = await this.collection.findOne({ name });
+    const user = await this.collection.findOne({ name: userData.name });
     if (!user) throw new Error('User not found');
 
-    const gameType = scoreData.gameType;
+    const gameType = userData.gameType;
 
     // Initialize scores as an object if it doesn't exist
     if (!user.scores || typeof user.scores !== 'object') {
-        user.scores = {};
+      user.scores = {};
     }
 
     // Increment or create score entry
     if (!user.scores[gameType]) {
-        user.scores[gameType] = { win: 0, loss: 0, draw: 0, createdAt: new Date().toISOString() };
+      user.scores[gameType] = {
+        win: 0,
+        loss: 0,
+        draw: 0,
+        createdAt: new Date().toISOString(),
+      };
     }
 
-    user.scores[gameType].win += scoreData.win || 0;
-    user.scores[gameType].loss += scoreData.loss || 0;
-    user.scores[gameType].draw += scoreData.draw || 0;
+    user.scores[gameType].win += userData.win || 0;
+    user.scores[gameType].loss += userData.loss || 0;
+    user.scores[gameType].draw += userData.draw || 0;
 
     const newStreak = (user.streak || 0) + 1;
     const newMaxStreak = Math.max(user.maxStreak || 0, newStreak);
 
     let achievements = user.achievements || [];
-    switch(user.scores[gameType].win) {
-        case 1:
-            achievements.unshift({ label: 'First Win!' });
+    switch (user.scores[gameType].win) {
+      case 1:
+        achievements.unshift({ label: 'First Win!' });
         break;
-        case 5:
-            achievements.unshift({ label: 'Congratulations - 5 Wins!' });
+      case 5:
+        achievements.unshift({ label: 'Congratulations - 5 Wins!' });
         break;
-        case 10:
-            achievements.unshift({ label: 'Congratulations - 10 Wins!' });
+      case 10:
+        achievements.unshift({ label: 'Congratulations - 10 Wins!' });
         break;
-        case 20:
-            achievements.unshift({ label: 'Congratulations - 20 Wins!' });
+      case 20:
+        achievements.unshift({ label: 'Congratulations - 20 Wins!' });
         break;
     }
 
     user.achievements = achievements;
 
-    await this.collection.updateOne({ name }, { $set: { scores: user.scores, streak: newStreak, maxStreak: newMaxStreak, achievements: user.achievements } });
+    await this.collection.updateOne(
+      { name: userData.name },
+      {
+        $set: {
+          scores: user.scores,
+          streak: newStreak,
+          maxStreak: newMaxStreak,
+          achievements: user.achievements,
+        },
+      },
+    );
 
-
-    const updatedUser = await this.collection.findOne({ name });
+    const updatedUser = await this.collection.findOne({ name: userData.name });
 
     return updatedUser;
-}
+  }
   /**
    * Get user scores
    */
@@ -169,7 +187,7 @@ class User {
   async updateScores(userId, scores) {
     const result = await this.collection.updateOne(
       { id: parseInt(userId) },
-      { $set: { scores } }
+      { $set: { scores } },
     );
 
     if (result.matchedCount === 0) {
@@ -188,12 +206,18 @@ class User {
         {
           $addFields: {
             totalWins: {
-              $sum: '$scores.win'
-            }
-          }
+              $sum: {
+                $map: {
+                  input: { $objectToArray: '$scores' }, // convert scores object to array
+                  as: 'score',
+                  in: '$$score.v.win', // sum the win property of each gameType
+                },
+              },
+            },
+          },
         },
         { $sort: { totalWins: -1 } },
-        { $limit: limit }
+        { $limit: limit },
       ])
       .toArray();
 

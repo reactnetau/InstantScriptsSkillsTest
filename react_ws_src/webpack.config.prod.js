@@ -9,35 +9,35 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: './'
+    publicPath: './',
   },
   plugins: [
     new MiniCssExtractPlugin({ filename: 'style.css' }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    })
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
   ],
   module: {
     rules: [
       {
         test: /\.(ico|gif|png|html|jpg|swf|xml|svg)$/,
         type: 'asset/resource',
-        generator: { filename: '[path][name][ext]' }
+        generator: { filename: '[path][name][ext]' },
       },
       {
         test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
         test: /\.jsx?$/,
         include: path.resolve(__dirname, 'src'),
-        use: { loader: 'babel-loader' }
+        use: { loader: 'babel-loader' },
       },
       {
         test: /(flickity|fizzy-ui-utils|get-size|unipointer|imagesloaded)/,
-        use: { loader: 'imports-loader', options: { wrapper: 'window' } }
-      }
-    ]
+        use: { loader: 'imports-loader', options: { wrapper: 'window' } },
+      },
+    ],
   },
-  resolve: { extensions: ['.js', '.jsx'] }
+  resolve: { extensions: ['.js', '.jsx'] },
 };

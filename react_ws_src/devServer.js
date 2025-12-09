@@ -13,7 +13,6 @@ const DB_NAME = 'instant_scripts_dev';
 let db;
 let userModel;
 
-
 MongoClient.connect(MONGO_URI)
   .then((client) => {
     console.log('✓ Connected to MongoDB');
@@ -28,73 +27,84 @@ MongoClient.connect(MONGO_URI)
   });
 
 async function initializeDatabase() {
-  await db.command({
-    collMod: 'users',
-    validator: {
-      $jsonSchema: {
-        bsonType: 'object',
-        required: ['id', 'name', 'createdAt'],
-        properties: {
-          _id: { bsonType: 'objectId' },
+  await db
+    .command({
+      collMod: 'users',
+      validator: {
+        $jsonSchema: {
+          bsonType: 'object',
+          required: [
+            'id',
+            'name',
+            'createdAt',
+            'scores',
+            'streak',
+            'maxStreak',
+            'achievements',
+            'history',
+          ],
+          properties: {
+            _id: { bsonType: 'objectId' },
 
-          id: {
-            bsonType: ['int', 'long', 'double'],
-            description: 'unique user id'
+            id: {
+              bsonType: ['int', 'long'],
+              description: 'unique user id',
+            },
+
+            name: {
+              bsonType: 'string',
+              minLength: 1,
+              maxLength: 100,
+            },
+
+            createdAt: {
+              bsonType: 'string',
+            },
+
+            scores: {
+              bsonType: 'object',
+              patternProperties: {
+                '^[a-zA-Z0-9_-]+$': {
+                  bsonType: 'object',
+                  required: ['win', 'loss', 'draw', 'createdAt'],
+                  properties: {
+                    win: { bsonType: ['int', 'long'], minimum: 0 },
+                    loss: { bsonType: ['int', 'long'], minimum: 0 },
+                    draw: { bsonType: ['int', 'long'], minimum: 0 },
+                    createdAt: { bsonType: 'string' },
+                  },
+                },
+              },
+            },
+
+            streak: {
+              bsonType: ['int', 'long'],
+              minimum: 0,
+            },
+
+            maxStreak: {
+              bsonType: ['int', 'long'],
+              minimum: 0,
+            },
+
+            achievements: {
+              bsonType: 'array',
+            },
+
+            history: {
+              bsonType: 'array',
+            },
           },
-
-          name: {
-            bsonType: 'string',
-            minLength: 1,
-            maxLength: 100
-          },
-
-          createdAt: {
-            bsonType: 'string'
-          },
-
-          scores: {
-            bsonType: 'object',
-            patternProperties: {
-              '^[a-zA-Z0-9_-]+$': {
-                bsonType: 'object',
-                required: ['win', 'loss', 'draw', 'createdAt'],
-                properties: {
-                  win: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                  loss: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                  draw: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                  createdAt: { bsonType: 'string' }
-                }
-              }
-            }
-          },
-
-          streak: {
-            bsonType: ['int', 'long', 'double'],
-            minimum: 0
-          },
-
-          maxStreak: {
-            bsonType: ['int', 'long', 'double'],
-            minimum: 0
-          },
-
-          achievements: {
-            bsonType: 'array'
-          },
-
-          history: {
-            bsonType: 'array'
-          }
-        }
+        },
+      },
+      validationLevel: 'moderate',
+      validationAction: 'error',
+    })
+    .catch((err) => {
+      if (err.codeName !== 'NamespaceNotFound') {
+        console.warn('Schema update warning:', err.message);
       }
-    },
-    validationLevel: 'moderate',
-    validationAction: 'error'
-  }).catch((err)=> {
-    if (err.codeName !== 'NamespaceNotFound') {
-      console.warn('Schema update warning:', err.message);
-    }
-  });
+    });
 }
 const app = express();
 
@@ -104,7 +114,7 @@ app.use(
   webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath,
     stats: 'minimal', // less verbose output
-  })
+  }),
 );
 
 app.use(express.json());
@@ -123,7 +133,7 @@ app.use(
     pathRewrite: {
       '^/images': '', // optional, if your backend paths don't have /images prefix
     },
-  })
+  }),
 );
 
 // SPA fallback
@@ -142,21 +152,14 @@ app.listen(PORT, '0.0.0.0', (err) => {
 
 // ==================== API Routes ====================
 
-// GET all users
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await userModel.findAll();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // GET user by name
 app.get('/api/users', async (req, res) => {
   try {
-    const user = await userModel.findByName(req.body.name);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await userModel.findByName(req.query.name);
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: `User not found - here ${req.query.name}` });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -166,13 +169,14 @@ app.get('/api/users', async (req, res) => {
 // POST create new user
 app.post('/api/users', async (req, res) => {
   try {
-    if (!req.body.name) return res.status(400).json({ error: 'Name is required' });
+    if (!req.body.name)
+      return res.status(400).json({ error: 'Name is required' });
 
     const existingUser = await userModel.findByName(req.body.name.trim());
     if (existingUser) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         error: 'User with this name already exists',
-        existingUserId: existingUser.id
+        existingUserId: existingUser.id,
       });
     }
 
@@ -183,22 +187,11 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-
-// GET all scores for a user
-app.get('/api/users/:id/scores', async (req, res) => {
-  try {
-    const scores = await userModel.getScores(req.params.id);
-    res.json(scores);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
 // POST add a new score for a user
 app.post('/api/users/scores', async (req, res) => {
   try {
     // Each call creates a new object in scores array
-    const score = await userModel.addScore(req.body.name, req.body);
+    const score = await userModel.addScore(req.body);
     res.status(201).json(score);
   } catch (err) {
     res.status(400).json({ error: err.message });

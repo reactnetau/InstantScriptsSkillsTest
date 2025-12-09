@@ -11,17 +11,19 @@ const Txt_page = () => {
   if (!page_x) return null;
 
   return (
-    <section id='Txt_page'>
-      <div id='page-container'>
+    <section id="Txt_page">
+      <div id="page-container">
         <h1>{page_x.pg_name}</h1>
 
         <div dangerouslySetInnerHTML={{ __html: page_x.txt.__cdata }} />
 
-        <div className='btns'>
-          {(new X2JS()).asArray(page_x.btns.b).map((b, i) => (
+        <div className="btns">
+          {new X2JS().asArray(page_x.btns.b).map((b, i) => (
             <Link to={b.u} key={i}>
-              <button type='submit' className='button'>
-                <span>{b.txt} <span className='fa fa-caret-right'></span></span>
+              <button type="submit" className="button">
+                <span>
+                  {b.txt} <span className="fa fa-caret-right"></span>
+                </span>
               </button>
             </Link>
           ))}

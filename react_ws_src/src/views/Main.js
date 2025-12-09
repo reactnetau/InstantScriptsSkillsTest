@@ -5,20 +5,16 @@ import Footer from './layouts/Footer';
 import PropTypes from 'prop-types';
 
 const fullHeightStyle = {
-  height: '100%'
+  height: '100%',
 };
 
 const Main = ({ children }) => {
-
   // Add semantic HTML & ARIA labels
   return (
     <div className="FullHeight" role="main">
       <Header />
-      
-      <MainContent role="article">
-        {children}
-      </MainContent>
 
+      <MainContent role="article">{children}</MainContent>
 
       <Footer />
     </div>
@@ -26,11 +22,11 @@ const Main = ({ children }) => {
 };
 
 Main.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
 Main.defaultProps = {
-  children: null
+  children: null,
 };
 
 export default Main;

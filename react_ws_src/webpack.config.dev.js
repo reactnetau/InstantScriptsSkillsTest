@@ -6,12 +6,12 @@ module.exports = {
   mode: 'development',
   entry: [
     'webpack-hot-middleware/client?reload=true', // enable HMR
-    './src/app.js' // your main entry
+    './src/app.js', // your main entry
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/',
   },
   devtool: 'cheap-module-source-map',
   module: {
@@ -23,35 +23,35 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            plugins: [require.resolve('react-refresh/babel')]
-          }
-        }
+            plugins: [require.resolve('react-refresh/babel')],
+          },
+        },
       },
       // SCSS
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       // CSS
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       // Images / icons / fonts
       {
         test: /\.(ico|gif|png|jpg|jpeg|svg|xml|html)$/,
         type: 'asset/resource',
         generator: {
-          filename: '[path][name][ext]'
-        }
-      }
-    ]
+          filename: '[path][name][ext]',
+        },
+      },
+    ],
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new ReactRefreshWebpackPlugin() // enables React Fast Refresh
+    new ReactRefreshWebpackPlugin(), // enables React Fast Refresh
   ],
   resolve: {
-    extensions: ['.js', '.jsx']
-  }
+    extensions: ['.js', '.jsx'],
+  },
 };

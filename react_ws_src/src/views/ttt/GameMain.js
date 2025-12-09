@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import TweenMax from 'gsap';
 import rand_to_fro from '../../helpers/rand_to_fro';
 import UserDetails from '../layouts/UserDetails';
-
+import Controls from '../layouts/Controls';
+import { ApiContext } from '../../contexts/ApiContext';
 const TicTacToe = ({ game_type, onEndGame }) => {
+  const { user, addUserScore, fetchLeaderboard } = useContext(ApiContext);
   const win_sets = [
     ['c1', 'c2', 'c3'],
     ['c4', 'c5', 'c6'],
@@ -19,12 +21,24 @@ const TicTacToe = ({ game_type, onEndGame }) => {
   const [next_turn_ply, setNextTurnPly] = useState(true);
   const [game_play, setGamePlay] = useState(true);
   const [game_stat, setGameStat] = useState('Start game');
-
+  const [difficulty, setDifficulty] = useState('easy');
   const refs = useRef({});
 
   useEffect(() => {
-    TweenMax.from('#game_stat', 1, { opacity: 0, scaleX: 0, scaleY: 0, ease: Power4.easeIn });
-    TweenMax.from('#game_board', 1, { opacity: 0, x: -200, y: -200, scaleX: 0, scaleY: 0, ease: Power4.easeIn });
+    TweenMax.from('#game_stat', 1, {
+      opacity: 0,
+      scaleX: 0,
+      scaleY: 0,
+      ease: Power4.easeIn,
+    });
+    TweenMax.from('#game_board', 1, {
+      opacity: 0,
+      x: -200,
+      y: -200,
+      scaleX: 0,
+      scaleY: 0,
+      ease: Power4.easeIn,
+    });
   }, []);
 
   const cell_cont = (c) => (
@@ -45,7 +59,12 @@ const TicTacToe = ({ game_type, onEndGame }) => {
   const turn_ply_comp = (cell_id) => {
     setCellVals((prevVals) => {
       const new_vals = { ...prevVals, [cell_id]: 'x' };
-      TweenMax.from(refs.current[cell_id], 0.7, { opacity: 0, scaleX: 0, scaleY: 0, ease: Power4.easeOut });
+      TweenMax.from(refs.current[cell_id], 0.7, {
+        opacity: 0,
+        scaleX: 0,
+        scaleY: 0,
+        ease: Power4.easeOut,
+      });
 
       const winner = checkWinner(new_vals);
       if (winner) {
@@ -60,12 +79,29 @@ const TicTacToe = ({ game_type, onEndGame }) => {
   };
 
   const turn_comp = (vals_snapshot) => {
-    const move = bestMoveMinimax(vals_snapshot);
+    let move;
+    if (difficulty === 'easy') {
+      move = randomMove(vals_snapshot);
+    } else if (difficulty === 'medium') {
+      move =
+        Math.random() < 0.5
+          ? bestMoveMinimax(vals_snapshot)
+          : randomMove(vals_snapshot);
+    } else {
+      // hard
+      move = bestMoveMinimax(vals_snapshot);
+    }
+
     if (!move) return;
 
     setCellVals((prevVals) => {
       const new_vals = { ...prevVals, [move]: 'o' };
-      TweenMax.from(refs.current[move], 0.7, { opacity: 0, scaleX: 0, scaleY: 0, ease: Power4.easeOut });
+      TweenMax.from(refs.current[move], 0.7, {
+        opacity: 0,
+        scaleX: 0,
+        scaleY: 0,
+        ease: Power4.easeOut,
+      });
 
       const winner = checkWinner(new_vals);
       if (winner) handleGameOver(winner);
@@ -73,6 +109,17 @@ const TicTacToe = ({ game_type, onEndGame }) => {
       setNextTurnPly(true);
       return new_vals;
     });
+  };
+
+  // Helper for random move
+  const randomMove = (vals) => {
+    const emptyCells = [];
+    for (let i = 1; i <= 9; i++) {
+      const key = 'c' + i;
+      if (!vals[key]) emptyCells.push(key);
+    }
+    if (emptyCells.length === 0) return null;
+    return emptyCells[Math.floor(Math.random() * emptyCells.length)];
   };
 
   // ------------------------ AI with Minimax ------------------------
@@ -128,7 +175,11 @@ const TicTacToe = ({ game_type, onEndGame }) => {
 
   const checkWinner = (vals) => {
     for (let set of win_sets) {
-      if (vals[set[0]] && vals[set[0]] === vals[set[1]] && vals[set[0]] === vals[set[2]]) {
+      if (
+        vals[set[0]] &&
+        vals[set[0]] === vals[set[1]] &&
+        vals[set[0]] === vals[set[2]]
+      ) {
         return vals[set[0]];
       }
     }
@@ -140,6 +191,18 @@ const TicTacToe = ({ game_type, onEndGame }) => {
     let msg = '';
     if (winner === 'draw') msg = 'Draw!';
     else msg = winner === 'x' ? 'You win!' : 'Computer wins!';
+
+    if (winner === 'x') {
+      console.log('name', user.name);
+      addUserScore({ gameType: 'ttt', name: user.name, win: 1 });
+    } else if (winner === 'draw') {
+      addUserScore({ gameType: 'ttt', name: user.name, draw: 1 });
+    } else {
+      addUserScore({ gameType: 'ttt', name: user.name, loss: 1 });
+    }
+
+    fetchLeaderboard();
+
     setGameStat(msg);
     setGamePlay(false);
   };
@@ -155,55 +218,68 @@ const TicTacToe = ({ game_type, onEndGame }) => {
 
   return (
     <div className="flex-row">
-      
-    <div id="GameMain">
-      <h1>Play {game_type}</h1>
+      <div id="GameMain" style={{ width: '700px' }}>
+        <Controls difficulty={difficulty} setDifficulty={setDifficulty} />
+        <h1>Play {game_type}</h1>
 
-      <div id="game_stat">
-        <div id="game_stat_msg">{game_stat}</div>
-        {game_play && <div id="game_turn_msg">{next_turn_ply ? 'Your turn' : 'Computer turn'}</div>}
-      </div>
+        <div id="game_stat">
+          <div id="game_stat_msg">{game_stat}</div>
+          {game_play && (
+            <div id="game_turn_msg">
+              {next_turn_ply ? 'Your turn' : 'Computer turn'}
+            </div>
+          )}
+        </div>
 
-      <div id="game_board">
-        <table>
-          <tbody>
-            {['c1','c2','c3','c4','c5','c6','c7','c8','c9'].reduce((rows, cell, i) => {
-              if (i % 3 === 0) rows.push([]);
-              rows[rows.length - 1].push(cell);
-              return rows;
-            }, []).map((row, i) => (
-              <tr key={i}>
-                {row.map((cell) => (
-                  <td
-                    key={cell}
-                    id={`game_board-${cell}`}
-                    ref={(el) => (refs.current[cell] = el)}
-                    onClick={click_cell}
-                  >
-                    {cell_cont(cell)}
-                  </td>
+        <div id="game_board">
+          <table>
+            <tbody>
+              {['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9']
+                .reduce((rows, cell, i) => {
+                  if (i % 3 === 0) rows.push([]);
+                  rows[rows.length - 1].push(cell);
+                  return rows;
+                }, [])
+                .map((row, i) => (
+                  <tr key={i}>
+                    {row.map((cell) => (
+                      <td
+                        key={cell}
+                        id={`game_board-${cell}`}
+                        ref={(el) => (refs.current[cell] = el)}
+                        onClick={click_cell}
+                      >
+                        {cell_cont(cell)}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-      </div>
-      
-      
-      <div style={{ width: '65%', display: 'flex', justifyContent:'space-between'}}>
-        <button type="submit" onClick={end_game} className="button">
-          <span>End Game <span className="fa fa-caret-right"></span></span>
-        </button>
-        {!game_play && (
-          <button type="submit" onClick={restart_game} className="button">
-            <span>Restart <span className="fa fa-caret-right"></span></span>
-          </button>
-        )}
-      </div>
-    </div>
-      <UserDetails />
+            </tbody>
+          </table>
+        </div>
 
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <button type="submit" onClick={end_game} className="button">
+            <span>
+              End Game <span className="fa fa-caret-right"></span>
+            </span>
+          </button>
+          {!game_play && (
+            <button type="submit" onClick={restart_game} className="button">
+              <span>
+                Restart <span className="fa fa-caret-right"></span>
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+      <UserDetails />
     </div>
   );
 };

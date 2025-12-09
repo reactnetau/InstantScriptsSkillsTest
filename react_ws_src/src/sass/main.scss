@@ -9,65 +9,69 @@
 ////////////////////////////////////////////////////////////////////// VARIABLES
 @import '_variables.scss';
 
-
 ////////////////////////////////////////////////////////////////////// SITEWIDE STYLES
 @import '_mixins.scss'; // MIXINS
 @import '_layout.scss'; // LAYOUT SPECIFIC
-html,body {
-	font-family: $bodyFont;
-	background-color: $colorPrimary;
-	// background-image: url(../../static/images/team-coach-bg.jpg);
-	-webkit-background-size: cover !important;
-	-moz-background-size: cover !important;
-	-o-background-size: cover !important;
-	background-size: cover !important;
-	background-position: center center !important;
-	background-repeat: no-repeat !important;
-	background-attachment:fixed;
-	// width:100%;
-	// height:100%;
-	position: relative;
+html,
+body {
+  font-family: $bodyFont;
+  background-color: $colorPrimary;
+  // background-image: url(../../static/images/team-coach-bg.jpg);
+  -webkit-background-size: cover !important;
+  -moz-background-size: cover !important;
+  -o-background-size: cover !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed;
+  // width:100%;
+  // height:100%;
+  position: relative;
 }
 /* apply a natural box layout model to all elements, but allowing components to change */
 html {
   box-sizing: border-box;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 input:focus,
 select:focus,
 textarea:focus,
 button:focus {
-    outline: none;
+  outline: none;
 }
 
 // add selectors here and they will perform subtle animation on resize
-header, img.active, #simple_popup a.close {
-	@include transition(.3s ease-in-out)
+header,
+img.active,
+#simple_popup a.close {
+  @include transition(0.3s ease-in-out);
 }
 .no-interfere {
-	@include transition(none)
+  @include transition(none);
 }
 a {
-	text-decoration: none;
-	cursor:pointer;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-#overlay{
-	width:100%;
-	height:100%;
-	position:fixed;
-	top:50px;
-	left:0;
-	background:rgba(0,0,0,.5);
-	z-index:1;
-	display:none;
-	//@include transition(all 400ms cubic-bezier(0.175, 0.885, 0.320, 1.275));
+#overlay {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  display: none;
+  //@include transition(all 400ms cubic-bezier(0.175, 0.885, 0.320, 1.275));
 }
-#overlay.show{
-	display:block;
-	//@include transition(all 400ms cubic-bezier(0.175, 0.885, 0.320, 1.275));
+#overlay.show {
+  display: block;
+  //@include transition(all 400ms cubic-bezier(0.175, 0.885, 0.320, 1.275));
 }
 
 ////////////////////////////////////////////////////////////////////// MAIN
@@ -78,8 +82,8 @@ a {
 
 ////////////////////////////////////////////////////////////////////// MAIN CONTENT
 section#main_content {
-	position: relative;
-	height:100%;
+  position: relative;
+  height: 100%;
 }
 
 ////////////////////////////////////////////////////////////////////// FOOTER
@@ -91,26 +95,26 @@ section#main_content {
 ////////////////////////////////////////////////////////////////////// GAME
 @import 'ttt.scss';
 
-.FullHeight{
-	height:100%;
+.FullHeight {
+  height: 100%;
 }
 
 .user-details {
-	top: 0;
-	display: flex;
-	padding: 20px;
+  top: 0;
+  display: flex;
+  padding: 20px;
 }
 
 .flex-row {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	width: 700px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 850px;
 }
 
 #GameMain {
-	width: 1200px;
-	float: left;
+  width: 2000px;
+  float: left;
 }
 
 // Optional theme variables
@@ -161,14 +165,189 @@ $light-border: #e0e0e0;
     border: 1px solid #eee;
     border-radius: 12px;
     padding: 20px;
-    min-height: 150px; // keeps layout stable when switching tabs
-
+    min-height: 15px; // keeps layout stable when switching tabs
+    height: 'auto';
     // Optional fade animation
     animation: fadeIn 0.2s ease;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+  font-family: 'Arial', sans-serif;
+
+  label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  .difficulty-options {
+    display: flex;
+    gap: 10px;
+
+    button {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 2px solid #4a90e2;
+      background-color: #f0f4ff;
+      color: #4a90e2;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background-color: #e0eaff;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        background-color: #4a90e2;
+        color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+}
+/* Global tokens */
+$primary: #4a90e2;
+$primary-light: #f0f4ff;
+$primary-hover: #e0eaff;
+
+$card-bg: #f4f4f4;
+$card-bg-alt: #e8e8e8;
+
+$text-dark: #333;
+$text-muted: #999;
+
+$accent-win: #2e8b57;
+$accent-rank: #ff7f50;
+
+/* Shared card style */
+.card {
+  padding: 10px 15px;
+  border-radius: 10px;
+  background-color: $card-bg;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition:
+    background 0.25s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Tabs */
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  button {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 2px solid $primary;
+    background: $primary-light;
+    color: $primary;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &.active {
+      background: $primary;
+      color: #fff;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    &:hover {
+      background: $primary-hover;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/* Leaderboard */
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .leaderboard-entry {
+    @extend .card;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:nth-child(odd) {
+      background-color: $card-bg-alt;
+    }
+
+    .rank {
+      color: $accent-rank;
+      font-weight: 700;
+      width: 40px;
+    }
+
+    .name {
+      flex-grow: 1;
+      color: $text-dark;
+      font-weight: 600;
+    }
+
+    .score {
+      color: $accent-win;
+      font-weight: 600;
+    }
+  }
+}
+
+.no-entries {
+  text-align: center;
+  color: $text-muted;
+  font-style: italic;
+}
+
+/* Achievements */
+.achievements-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  .achievement-entry {
+    @extend .card;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+.no-achievements {
+  text-align: center;
+  color: $text-muted;
+  font-style: italic;
 }

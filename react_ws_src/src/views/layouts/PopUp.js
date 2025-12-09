@@ -31,13 +31,13 @@ const PopUp = ({ pageTitle, children }) => {
       style={{ bottom: spring(bottom, springValue) }}
     >
       {(value) => (
-        <section id='simple_popup' style={{ bottom: value.bottom }}>
-          <div className='container'>
-            <a className='close fa fa-close' onClick={closeMe}></a>
+        <section id="simple_popup" style={{ bottom: value.bottom }}>
+          <div className="container">
+            <a className="close fa fa-close" onClick={closeMe}></a>
             <h3>{pageTitle}</h3>
           </div>
-          <div className='content'>
-            <div className='container'>{children}</div>
+          <div className="content">
+            <div className="container">{children}</div>
           </div>
         </section>
       )}

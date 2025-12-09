@@ -5,50 +5,49 @@ import PropTypes from 'prop-types';
 import MessageBar from '../layouts/MessageBar';
 
 const Header = () => {
+  return (
+    <header id="main_header">
+      <div id="brand">
+        <div className="container">
+          <Link
+            to={app.settings.ws_conf.header.head_l_logo.u}
+            className="logo-tl"
+          >
+            <img src={app.settings.ws_conf.header.head_l_logo.i} />
+          </Link>
 
-	return (
-		<header id='main_header'>
-			<div id='brand'>
-				<div className='container'>
+          <Link
+            to={app.settings.ws_conf.header.site_title.u}
+            className="main-site-name"
+          >
+            {app.settings.ws_conf.header.site_title.txt}
+          </Link>
 
-					<Link to={app.settings.ws_conf.header.head_l_logo.u} className='logo-tl'>
-						<img src={app.settings.ws_conf.header.head_l_logo.i} />
-					</Link>
+          <nav>
+            <ul>
+              {app.settings.ws_conf.main_menu.pages.p.map(function (p, i) {
+                return (
+                  <li key={i}>
+                    <Link to={p.u}>
+                      <i className={'fa fa-2x ' + p.ico} aria-hidden="true"></i>
+                      {p.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </div>
 
+      <MessageBar />
+    </header>
+  );
 
-					<Link to={app.settings.ws_conf.header.site_title.u} className='main-site-name'>
-						{app.settings.ws_conf.header.site_title.txt}
-					</Link>
-
-					<nav>
-						<ul>
-							{
-								app.settings.ws_conf.main_menu.pages.p.map(function (p, i) {
-									return (
-										<li key={i}>
-											<Link 	to={p.u} >
-												<i className={'fa fa-2x '+p.ico} aria-hidden="true"></i>
-												{p.name}
-											</Link>
-										</li>
-									)
-								})
-							}
-						</ul>
-					</nav>
-
-				</div>
-			</div>
-
-			<MessageBar />
-
-		</header>
-	)
-
-								// <li className='showMobile'>
-								// 	<Link ref='lnkMenu' className='menu no-interfere' to='' onClick={this.showHomeClicked.bind(this)}>menu</Link>
-								// </li>
-/*
+  // <li className='showMobile'>
+  // 	<Link ref='lnkMenu' className='menu no-interfere' to='' onClick={this.showHomeClicked.bind(this)}>menu</Link>
+  // </li>
+  /*
 	showPageClicked (e) {
 		e.preventDefault()
 		this.context.router.push(e.target.href)
@@ -63,12 +62,12 @@ const Header = () => {
 		return false
 	}
 */
-}
+};
 
 // property validation
 Header.propTypes = {
-	children: PropTypes.any
-}
+  children: PropTypes.any,
+};
 
 // Header.contextTypes = {
 // 	router: PropTypes.object.isRequired

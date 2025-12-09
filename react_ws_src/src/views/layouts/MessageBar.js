@@ -32,17 +32,19 @@ const MessageBar = () => {
   if (msgs.length === 0) return null;
 
   return (
-    <div id='msg_bar' ref={msgBarRef}>
-      <div className='container'>
+    <div id="msg_bar" ref={msgBarRef}>
+      <div className="container">
         <div>
           {msgs.map((m, i) => (
-            <p className='one_line' key={i}>
-              <span className='exclaim'>{m.h.length > 1 ? m.h + ' : ' : ''}</span>
+            <p className="one_line" key={i}>
+              <span className="exclaim">
+                {m.h.length > 1 ? m.h + ' : ' : ''}
+              </span>
               {m.m}
               <br />
             </p>
           ))}
-          <a className='close fa fa-close' onClick={closeWindow}></a>
+          <a className="close fa fa-close" onClick={closeWindow}></a>
         </div>
       </div>
     </div>
