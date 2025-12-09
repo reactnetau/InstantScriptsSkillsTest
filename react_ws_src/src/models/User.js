@@ -53,7 +53,11 @@ class User {
     createdAt: now,
     scores: {
       ttt: { win: 0, loss: 0, draw: 0 }
-    }
+    },
+    streak: 0,
+    maxStreak: 0,
+    achievements: [],
+    history: [],
   };
 
   // Insert into collection
@@ -95,32 +99,56 @@ class User {
    * Add score to user
    */
   async addScore(name, scoreData) {
-  if (!scoreData.gameType) {
-    throw new Error('gameType is required');
-  }
+    if (!scoreData.gameType) {
+        throw new Error('gameType is required');
+    }
 
-  const user = await this.collection.findOne({ name });
-  if (!user) throw new Error('User not found');
+    const user = await this.collection.findOne({ name });
+    if (!user) throw new Error('User not found');
 
-  const gameType = scoreData.gameType;
+    const gameType = scoreData.gameType;
 
-  // Initialize scores as an object if it doesn't exist
-  if (!user.scores || typeof user.scores !== 'object') {
-    user.scores = {};
-  }
+    // Initialize scores as an object if it doesn't exist
+    if (!user.scores || typeof user.scores !== 'object') {
+        user.scores = {};
+    }
 
-  // Increment or create score entry
-  if (!user.scores[gameType]) {
-    user.scores[gameType] = { win: 0, loss: 0, draw: 0, createdAt: new Date().toISOString() };
-  }
+    // Increment or create score entry
+    if (!user.scores[gameType]) {
+        user.scores[gameType] = { win: 0, loss: 0, draw: 0, createdAt: new Date().toISOString() };
+    }
 
-  user.scores[gameType].win += scoreData.win || 0;
-  user.scores[gameType].loss += scoreData.loss || 0;
-  user.scores[gameType].draw += scoreData.draw || 0;
+    user.scores[gameType].win += scoreData.win || 0;
+    user.scores[gameType].loss += scoreData.loss || 0;
+    user.scores[gameType].draw += scoreData.draw || 0;
 
-  await this.collection.updateOne({ name }, { $set: { scores: user.scores } });
+    const newStreak = (user.streak || 0) + 1;
+    const newMaxStreak = Math.max(user.maxStreak || 0, newStreak);
 
-  return user.scores[gameType];
+    let achievements = user.achievements || [];
+    switch(user.scores[gameType].win) {
+        case 1:
+            achievements.unshift({ label: 'First Win!' });
+        break;
+        case 5:
+            achievements.unshift({ label: 'Congratulations - 5 Wins!' });
+        break;
+        case 10:
+            achievements.unshift({ label: 'Congratulations - 10 Wins!' });
+        break;
+        case 20:
+            achievements.unshift({ label: 'Congratulations - 20 Wins!' });
+        break;
+    }
+
+    user.achievements = achievements;
+
+    await this.collection.updateOne({ name }, { $set: { scores: user.scores, streak: newStreak, maxStreak: newMaxStreak, achievements: user.achievements } });
+
+
+    const updatedUser = await this.collection.findOne({ name });
+
+    return updatedUser;
 }
   /**
    * Get user scores

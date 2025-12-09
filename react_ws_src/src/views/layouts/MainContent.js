@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import UserDetails from './UserDetails';
 
 const MainContent = ({ children }) => {
   return (

@@ -28,56 +28,73 @@ MongoClient.connect(MONGO_URI)
   });
 
 async function initializeDatabase() {
-    await db.command({
-      collMod: 'users',
-      validator: {
-        $jsonSchema: {
-          bsonType: 'object',
-          required: ['id', 'name', 'createdAt'],
-          properties: {
-            _id: { bsonType: 'objectId' },
-            id: {
-              bsonType: ['int', 'long', 'double'],
-              description: 'unique user id'
-            },
-            name: {
-              bsonType: 'string',
-              minLength: 1,
-              maxLength: 100
-            },
-            email: {
-              bsonType: 'string',
-              pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
-            },
-            createdAt: {
-              bsonType: 'string'
-            },
-            scores: {
-              bsonType: 'object',
-              patternProperties: {
-                '^[a-zA-Z0-9_-]+$': {
-                    bsonType: 'object',
-                    required: ['win', 'loss', 'draw', 'createdAt'],
-                    properties: {
-                      win: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                      loss: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                      draw: { bsonType: ['int', 'long', 'double'], minimum: 0 },
-                      createdAt: { bsonType: 'string' }
-                    }
-                  }
+  await db.command({
+    collMod: 'users',
+    validator: {
+      $jsonSchema: {
+        bsonType: 'object',
+        required: ['id', 'name', 'createdAt'],
+        properties: {
+          _id: { bsonType: 'objectId' },
+
+          id: {
+            bsonType: ['int', 'long', 'double'],
+            description: 'unique user id'
+          },
+
+          name: {
+            bsonType: 'string',
+            minLength: 1,
+            maxLength: 100
+          },
+
+          createdAt: {
+            bsonType: 'string'
+          },
+
+          scores: {
+            bsonType: 'object',
+            patternProperties: {
+              '^[a-zA-Z0-9_-]+$': {
+                bsonType: 'object',
+                required: ['win', 'loss', 'draw', 'createdAt'],
+                properties: {
+                  win: { bsonType: ['int', 'long', 'double'], minimum: 0 },
+                  loss: { bsonType: ['int', 'long', 'double'], minimum: 0 },
+                  draw: { bsonType: ['int', 'long', 'double'], minimum: 0 },
+                  createdAt: { bsonType: 'string' }
                 }
               }
             }
+          },
+
+          streak: {
+            bsonType: ['int', 'long', 'double'],
+            minimum: 0
+          },
+
+          maxStreak: {
+            bsonType: ['int', 'long', 'double'],
+            minimum: 0
+          },
+
+          achievements: {
+            bsonType: 'array'
+          },
+
+          history: {
+            bsonType: 'array'
+          }
         }
-      },
-      validationLevel: 'moderate',
-      validationAction: 'error'
-    }).catch((err) => {
-      if (err.codeName !== 'NamespaceNotFound') {
-        console.warn('Schema update warning:', err.message);
       }
-    });
-  
+    },
+    validationLevel: 'moderate',
+    validationAction: 'error'
+  }).catch((err)=> {
+    if (err.codeName !== 'NamespaceNotFound') {
+      console.warn('Schema update warning:', err.message);
+    }
+  });
 }
 const app = express();
 

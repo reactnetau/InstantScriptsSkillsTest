@@ -14,9 +14,12 @@ const Main = ({ children }) => {
   return (
     <div className="FullHeight" role="main">
       <Header />
+      
       <MainContent role="article">
         {children}
       </MainContent>
+
+
       <Footer />
     </div>
   );

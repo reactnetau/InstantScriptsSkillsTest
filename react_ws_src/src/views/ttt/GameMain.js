@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import TweenMax from 'gsap';
 import rand_to_fro from '../../helpers/rand_to_fro';
+import UserDetails from '../layouts/UserDetails';
 
 const TicTacToe = ({ game_type, onEndGame }) => {
   const win_sets = [
@@ -153,6 +154,8 @@ const TicTacToe = ({ game_type, onEndGame }) => {
   };
 
   return (
+    <div className="flex-row">
+      
     <div id="GameMain">
       <h1>Play {game_type}</h1>
 
@@ -184,8 +187,10 @@ const TicTacToe = ({ game_type, onEndGame }) => {
             ))}
           </tbody>
         </table>
+        
       </div>
-
+      
+      
       <div style={{ width: '65%', display: 'flex', justifyContent:'space-between'}}>
         <button type="submit" onClick={end_game} className="button">
           <span>End Game <span className="fa fa-caret-right"></span></span>
@@ -196,6 +201,9 @@ const TicTacToe = ({ game_type, onEndGame }) => {
           </button>
         )}
       </div>
+    </div>
+      <UserDetails />
+
     </div>
   );
 };

@@ -94,3 +94,81 @@ section#main_content {
 .FullHeight{
 	height:100%;
 }
+
+.user-details {
+	top: 0;
+	display: flex;
+	padding: 20px;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	width: 700px;
+}
+
+#GameMain {
+	width: 1200px;
+	float: left;
+}
+
+// Optional theme variables
+$blue: #3a68ff;
+$light-bg: #f7f7f8;
+$light-border: #e0e0e0;
+
+.user-details {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column; // ensures content flows vertically
+  gap: 18px;
+
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+
+    button {
+      background: $light-bg;
+      border: 1px solid $light-border;
+      padding: 10px 18px;
+      font-size: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.25s ease;
+      color: #444;
+
+      &:hover {
+        background: #ececec;
+        transform: translateY(-1px);
+      }
+
+      &.active {
+        background: $blue;
+        color: white;
+        border-color: $blue;
+        box-shadow: 0 4px 14px rgba(58, 104, 255, 0.3);
+      }
+    }
+  }
+
+  .content {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 150px; // keeps layout stable when switching tabs
+
+    // Optional fade animation
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
